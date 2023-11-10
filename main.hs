@@ -10,12 +10,6 @@ printRow m = putStrLn $ unwords (replicate m "■")
 printMatrix :: Int -> IO ()
 printMatrix m = replicateM_ m (printRow m)
 
-getUserMessage :: IO ()
-getUserMessage = do
-    putStrLn "Enter a message:"
-    userMessage <- getLine
-    putStrLn $ "User message: " ++ userMessage
-
 main :: IO ()
 main = do
     args <- getArgs
