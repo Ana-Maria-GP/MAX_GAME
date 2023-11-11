@@ -5,8 +5,8 @@ import System.Random
 
 
 -- Function to create a matrix of size n
-createMatrix :: Int -> [[Int]]
-createMatrix n = replicate n (replicate n 0)
+createMatrix :: Int -> [[Char]]
+createMatrix n = replicate n (replicate n '0')
 
 -- Function to print a matrix
 printMatrix :: [[Char]] -> IO ()
@@ -23,6 +23,11 @@ randomNumberWithSeed seed = do
         randomNumber = fst $ randomR (1, 5) generator
     putStrLn $ "Random number between 1 and 5 with seed " ++ show seed ++ ": " ++ show randomNumber
 
+updateMatrixElem :: Int -> Int -> Char -> [[Char]] -> [[Char]]
+updateMatrixElem x y newChar matrix =
+    take x matrix ++
+    [take y (matrix !! x) ++ [newChar] ++ drop (y + 1) (matrix !! x)] ++
+    drop (x + 1) matrix
 
 main :: IO ()
 main = do
@@ -32,8 +37,9 @@ main = do
             let size = read sizeStr :: Int
                 seed = read seedStr :: Int
                 matrix = replicate size (replicate size '0')
+                updatedMatrixElem = updateMatrixElem 2 3 'A' matrix
             putStrLn $ "Matriz de " ++ show size ++ "x" ++ show size 
-            printMatrix matrix
+            printMatrix updatedMatrixElem
             putStrLn "Bom dia bld:"
             answer <- getLine
             if answer /= "terminar"
