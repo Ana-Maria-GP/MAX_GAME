@@ -4,14 +4,17 @@ import System.Process
 import System.Random
 
 
--- Function to print a single row
-printRow :: Int -> IO ()
-printRow m = putStrLn $ unwords (replicate m "■")
+-- Function to create a matrix of size n
+createMatrix :: Int -> [[Int]]
+createMatrix n = replicate n (replicate n 0)
 
--- Function to print the matrix
-printMatrix :: Int -> IO ()
-printMatrix m = replicateM_ m (printRow m)
+-- Function to print a matrix
+printMatrix :: [[Char]] -> IO ()
+printMatrix matrix = mapM_ printRow matrix
+  where
+    printRow row = putStrLn $ unwords (map (\c -> [c]) row)
 
+  
 -- Function to generate a random number between 1 and 5 with a seed
 randomNumberWithSeed :: Int -> IO ()
 randomNumberWithSeed seed = do
@@ -25,15 +28,17 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
-        [sizeStr] -> do
+        [sizeStr,seedStr] -> do
             let size = read sizeStr :: Int
+                seed = read seedStr :: Int
+                matrix = replicate size (replicate size '0')
             putStrLn $ "Matriz de " ++ show size ++ "x" ++ show size 
-            printMatrix size
+            printMatrix matrix
             putStrLn "Bom dia bld:"
             answer <- getLine
             if answer /= "terminar"
                 then do
                     _ <- system "clear"  -- Use "cls" on Windows
                     main
-                else randomNumberWithSeed 420
+                else randomNumberWithSeed seed
         _ -> putStrLn "Para ejecutar: ./Jogo <tamano>"
