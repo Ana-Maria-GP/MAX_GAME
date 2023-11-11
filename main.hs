@@ -29,6 +29,46 @@ updateMatrixElem x y newChar matrix =
     [take y (matrix !! x) ++ [newChar] ++ drop (y + 1) (matrix !! x)] ++
     drop (x + 1) matrix
 
+applyRandomWalls :: Int -> [[Char]] -> IO [[Char]]
+applyRandomWalls 0 matrix = return matrix
+applyRandomWalls n matrix = do
+    x <- randomRIO (0, length matrix - 1)
+    y <- randomRIO (0, length (head matrix) - 1)
+    updatedMatrix <- createWall x y 2.0 matrix  -- Adjust the threshold as needed
+    applyRandomWalls (n - 1) updatedMatrix
+
+-- Function to create a wall
+createWall :: Int -> Int -> Float -> [[Char]] -> IO [[Char]]
+createWall x y threshold matrix
+  | x <= 0 || y <= 0 || x >= length matrix || y >= length matrix = return matrix  -- Stop recursion if x or y is non-positive
+  | otherwise = do
+    let directions = ['A', 'B', 'C', 'D']
+    let directionsLength = length directions
+    directionIndex <- randomRIO (0, directionsLength - 1)
+    putStrLn $ "Direction index: " ++ show directionIndex  -- Debug print
+    let direction = directions !! directionIndex
+    putStrLn $ "Chosen direction: " ++ [direction]  -- Debug print
+    roll <- randomIO :: IO Float
+    putStrLn $ "Roll value: " ++ show roll  -- Debug print
+
+    if roll < threshold then
+        case direction of
+            'A' -> do
+                putStrLn "Creating wall upwards"  -- Debug print
+                createWall (x - 1) y ((threshold / 3) * 2) (updateMatrixElem x y 'L' matrix)
+            'B' -> do
+                putStrLn "Creating wall downwards"  -- Debug print
+                createWall (x + 1) y (threshold / 2) (updateMatrixElem x y 'L' matrix)
+            'C' -> do
+                putStrLn "Creating wall to the left"  -- Debug print
+                createWall x (y - 1) (threshold / 2) (updateMatrixElem x y 'L' matrix)
+            'D' -> do
+                putStrLn "Creating wall to the right"  -- Debug print
+                createWall x (y + 1) (threshold / 2) (updateMatrixElem x y 'L' matrix)
+    else do
+        putStrLn "No wall created"  -- Debug print
+        return matrix
+
 main :: IO ()
 main = do
     args <- getArgs
@@ -37,9 +77,9 @@ main = do
             let size = read sizeStr :: Int
                 seed = read seedStr :: Int
                 matrix = replicate size (replicate size '0')
-                updatedMatrixElem = updateMatrixElem 2 3 'A' matrix
+            updatedMatrix <- applyRandomWalls (read sizeStr) matrix  -- Replace 5 with the number of walls you want to create
             putStrLn $ "Matriz de " ++ show size ++ "x" ++ show size 
-            printMatrix updatedMatrixElem
+            printMatrix updatedMatrix
             putStrLn "Bom dia bld:"
             answer <- getLine
             if answer /= "terminar"
