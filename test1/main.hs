@@ -6,16 +6,16 @@ mapSize = 10
 -- Mapa predeterminado
 defaultMap :: [[Char]]
 defaultMap =
-    [ "##########"
-    , "#@       #"
-    , "#        #"
-    , "# ##  ####"
-    , "#        #"
-    , "#X  #### #"
-    , "####     #"
-    , "#   #####X"
-    , "#        #"
-    , "##########"
+    [ "LLLLLLLLLL"  
+    , "L@       L"
+    , "L        L"
+    , "L LL $LLLL"
+    , "L        L"
+    , "L   LLLL L"
+    , "LL L     L"
+    , "L   L L$LL"
+    , "L       XL"
+    , "LLLLLLLLLL"
     ]
 
 -- Función para imprimir el mapa
@@ -44,8 +44,8 @@ updateMap gameMap (x, y) =
     let (row1, playerRow:row2) = splitAt y gameMap
         (left, _:right) = splitAt x playerRow
     in row1 ++ [left ++ ['@'] ++ right] ++ row2
-    -- Función principal para jugar
-    
+
+--Función principal para jugar    
 
 playGame :: [[Char]] -> Position -> IO ()
 playGame gameMap playerPos = do
@@ -58,7 +58,7 @@ playGame gameMap playerPos = do
             'S' -> Down
             'D' -> Main.Right
             'Q' -> Quit
-            _   -> error "Entrada no válida"
+            _   -> error "error de caracter"
     -- Consume el carácter de salto de línea
     _ <- getChar
     if dir == Quit
@@ -81,12 +81,12 @@ playGame gameMap playerPos = do
 -- Función para verificar si el movimiento es válido
 isValidMove :: [[Char]] -> Position -> Bool
 isValidMove gameMap (x, y) =
-    x >= 0 && x < mapSize && y >= 0 && y < mapSize && gameMap !! y !! x /= '#'
+    x >= 0 && x < mapSize && y >= 0 && y < mapSize && gameMap !! y !! x /= 'L' && gameMap !! y !! x /= '$' 
 
 
 
 main :: IO ()
 main = do
     putStrLn "Bienvenido al mejor juego que creare en mi vida de haskell"
-    let initialPlayerPos = (1, 1)  -- Posición inicial del jugador
+    let initialPlayerPos = (1, 1)  -- Punto Partida
     playGame defaultMap initialPlayerPos
