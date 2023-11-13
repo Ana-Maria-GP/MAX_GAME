@@ -109,23 +109,12 @@ playGame gameMap playerPos = do
 -- Función para verificar si el movimiento es válido
 isValidMove :: [[Char]] -> Position -> Bool
 isValidMove gameMap (x, y) =
-    x >= 0 && x < mapSize && y >= 0 && y < mapSize && gameMap !! y !! x /= 'L' && gameMap !! y !! x /= '$' 
+    x >= 0 && x < mapSize && y >= 0 && y < mapSize && gameMap !! y !! x /= '#'
+
 
 
 main :: IO ()
 main = do
-    args <- getArgs
-    putStrLn "Bienvenido "
-    let numRows = if length args > 0 then read (head args) else 20
-    randomMap <- generateRandomMap numRows
-    let initialPlayerPos = (1, 1)  -- Punto Partida    
-    playGame randomMap initialPlayerPos
-------
-
-
-
-{-
-
-  
-  mapM_ putStrLn randomMap
--}
+    putStrLn "Bienvenido al mejor juego que creare en mi vida de haskell"
+    let initialPlayerPos = (1, 1)  -- Posición inicial del jugador
+    playGame defaultMap initialPlayerPos
