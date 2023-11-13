@@ -1,5 +1,8 @@
 import System.Environment
 import System.Random
+import Data.List
+
+type Maze = [[Char]]
 
 --seccion de mapa
 randomChar :: Int -> Int -> Int -> IO Char
@@ -10,22 +13,30 @@ randomChar row col numRows = do
     (0, _) -> 'L'
     (1, _) -> ' '
     
-generateRandomMap :: Int -> IO [[Char]]
+generateRandomMap :: Int -> IO Maze
 generateRandomMap numRows = do
-  let rowIndices = [0 .. numRows - 1]
-      colIndices = [0 .. numRows - 1]  -- Mismo número de columnas que de filas
-  rows <- sequence
-    [ do
-        row <- sequence
-          [ do
-              char <- randomChar row col numRows
-              return char
-          | col <- colIndices
-          ]
-        return row
-    | row <- rowIndices
-    ]
-  return rows
+    let rowIndices = [0 .. numRows - 1]
+        colIndices = [0 .. numRows - 1]  -- Mismo número de columnas que de filas
+    rows <- sequence
+        [ do
+            row <- sequence
+                [ do
+                    char <- randomChar row col numRows
+                    return char
+                | col <- colIndices
+                ]
+            return row
+        | row <- rowIndices
+        ]
+    -- Agregar un tesoro 'X' de forma aleatoria
+    randX <- randomRIO (0, numRows - 1)
+    randY <- randomRIO (0, numRows - 1)
+    let newRow = replaceNth randX 'X' (rows !! randY)
+    let newRows = replaceNth randY newRow rows
+    return newRows
+
+replaceNth :: Int -> a -> [a] -> [a]
+replaceNth n newVal xs = take n xs ++ [newVal] ++ drop (n + 1) xs
 
 -- Tamaño del mapa test
 mapSize :: Int
@@ -109,12 +120,23 @@ playGame gameMap playerPos = do
 -- Función para verificar si el movimiento es válido
 isValidMove :: [[Char]] -> Position -> Bool
 isValidMove gameMap (x, y) =
-    x >= 0 && x < mapSize && y >= 0 && y < mapSize && gameMap !! y !! x /= '#'
-
+    x >= 0 && x < mapSize && y >= 0 && y < mapSize && gameMap !! y !! x /= 'L' && gameMap !! y !! x /= '$' 
 
 
 main :: IO ()
 main = do
-    putStrLn "Bienvenido al mejor juego que creare en mi vida de haskell"
-    let initialPlayerPos = (1, 1)  -- Posición inicial del jugador
-    playGame defaultMap initialPlayerPos
+    args <- getArgs
+    putStrLn "Bienvenido "
+    let numRows = if length args > 0 then read (head args) else 20
+    randomMap <- generateRandomMap numRows
+    let initialPlayerPos = (1, 1)  -- Punto Partida    
+    playGame randomMap initialPlayerPos
+------
+
+
+
+{-
+
+  
+  mapM_ putStrLn randomMap
+-}
